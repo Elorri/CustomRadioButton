@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="RadialRadioButton">
-        <attr name="radius" format="integer"/>
+        <attr name="radiusPoint" format="integer"/>
         <attr name="radiusSelector" format="integer"/>
+        <attr name="colorPoint" format="integer"/>
+        <attr name="colorSelector" format="integer"/>
     </declare-styleable>
 </resources>
