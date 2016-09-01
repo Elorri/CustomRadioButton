@@ -39,8 +39,8 @@ public class RadialRadioButton extends RadioButton {
     private int measuredWidthInPx;
 
     //Canvas dimensions
-    private int heightInPx;
-    private int widthInPx;
+    private int minimumHeightInPx;
+    private int minimumWidthInPx;
 
 
 
@@ -126,7 +126,6 @@ public class RadialRadioButton extends RadioButton {
         colorPoint = Color.BLUE;
         paint.setColor(colorPoint);
         int radiusPointInPx = (int)convertToPx(radiusPoint);
-        //canvas.drawCircle((widthInPx / 2)+5, (heightInPx / 2)+5, radiusPointInPx, paint);
         canvas.drawCircle(measuredWidthInPx / 2, measureHeightInPx / 2, radiusPointInPx, paint);
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp" + radiusPoint + " radius in px" + radiusPointInPx);
     }
@@ -138,51 +137,30 @@ public class RadialRadioButton extends RadioButton {
         colorSelector = Color.RED;
         paint.setColor(colorSelector);
         int radiusSelectorInPx = (int)convertToPx(radiusSelector);
-        //canvas.drawCircle((widthInPx / 2)+5, (heightInPx / 2)+5, radiusSelectorInPx, paint);
         canvas.drawCircle(measuredWidthInPx / 2, measureHeightInPx / 2, radiusSelectorInPx, paint);
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp" + radiusSelector + " radius in px" + radiusSelectorInPx);
     }
 
 
     private float convertToPx(int dp) {
-//        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-//        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
-        return dp*5;
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
     }
 
-    public float convertPixelsToDp(float px){
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        float dp = px / ((float)displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-        return dp;
-    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measure width in px " + widthMeasureSpec + "measure height in px " + heightMeasureSpec);
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measure width in dp " + convertPixelsToDp(widthMeasureSpec) + "measure height in dp " + convertPixelsToDp(heightMeasureSpec));
         measuredWidthInPx = getMeasuredWidth();
         measureHeightInPx=getMeasuredHeight();
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measuredWidth " + measuredWidthInPx + "measureHeight " + measureHeightInPx);
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measuredWidth in dp" + convertPixelsToDp(measuredWidthInPx) + "measureHeight in dp" + convertPixelsToDp(measureHeightInPx));
 
-
-
-        int minimumWidthPx=Math.max((int)convertToPx(radiusPoint*2), (int)convertToPx(radiusSelector*2));
+        int diameterPointInPx=(int)convertToPx(radiusPoint*2);
+        int diameterSelectorInPx=(int)convertToPx(radiusSelector*2);
+        int minimumWidthPx=Math.max(diameterPointInPx, diameterSelectorInPx);
         int minimumHeightPx=Math.max((int)convertToPx(radiusPoint*2), (int)convertToPx(radiusSelector*2));
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "minimumCanvasWidthPx " + minimumWidthPx + "minimumCanvasHeightPx " + minimumHeightPx);
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "minimumCanvasWidthPx " + convertPixelsToDp(minimumWidthPx) + "minimumCanvasHeightPx " + convertPixelsToDp(minimumHeightPx));
+        minimumWidthInPx = minimumWidthPx;
+        minimumHeightInPx = minimumHeightPx;
 
-        widthInPx = minimumWidthPx;
-        heightInPx = minimumHeightPx;
-
-
-//        widthInPx = Math.max(minimumWidthPx, measuredWidth);
-//        heightInPx = Math.max(minimumHeightPx, measureHeight);
-
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "widthInPx " + widthInPx + "widthInPx " + heightInPx);
-
-        //setMeasuredDimension(widthInPx+10, heightInPx+10);
         setMeasuredDimension(measuredWidthInPx, measureHeightInPx);
     }
 }
