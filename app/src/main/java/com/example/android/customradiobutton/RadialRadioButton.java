@@ -11,7 +11,9 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ViewGroup;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 /**
  * Created by nebo-android2016 on 01/09/16.
@@ -26,7 +28,9 @@ public class RadialRadioButton extends RadioButton {
     private static final int DEFAULT_TEXT_COLOR = Color.DKGRAY;
     private static final int DEFAULT_TEXT_SIZE = 24;
     private static final int DEFAULT_TEXT_MARGIN_TOP = 24;
-    private static final Typeface DEFAULT_NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);;
+    private static final int DEFAULT_SHAPE_MIN_PADDING=24;
+    private static final Typeface DEFAULT_NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
+    ;
 
 
     //The radius of the point that will be drawn in the center of the view
@@ -50,7 +54,15 @@ public class RadialRadioButton extends RadioButton {
     private int measuredWidthInPx;
 
 
-
+    private int centerShapeX;
+    private int centerYcircles;
+    private int textHeight;
+    private int textWidth;
+    private int minShapeHeight;
+    private int minShapeWidth;
+    private int radiusPointInPx;
+    private int radiusSelectorInPx;
+    private int minDiameterCirclesInPx;
 
 
 //    //Size of the rectangle in which to bigger circle (point or selector) + text (if there is some) fits = minimum size rectangle to see the drawing completely
@@ -63,9 +75,10 @@ public class RadialRadioButton extends RadioButton {
 
 
     //Paints
-    Paint pointPaint=new Paint();
-    Paint selectorPaint=new Paint();
-    Paint textPaint=new Paint();
+    Paint pointPaint = new Paint();
+    Paint selectorPaint = new Paint();
+    Paint textPaint = new Paint();
+
 
 
     public RadialRadioButton(Context context, AttributeSet attrs) {
@@ -147,37 +160,6 @@ public class RadialRadioButton extends RadioButton {
         //I try waiting for onSizeChanged to be called to get the size of the canvas that is able to fit the view instead, but I don't get better result.
         //I will rely only on the onMeasureMethod
 
-
-
-        int centerShapeX;
-        int centerYcircles = 0;
-        int textHeight = 0;
-        int textWidth = 0;
-        int minShapeHeight = 0;
-        int minShapeWidth=0;
-
-        int radiusPointInPx = (int) convertToPx(radiusPoint);
-        int radiusSelectorInPx = (int) convertToPx(radiusSelector);
-        int minDiameterCirclesInPx = Math.max(radiusPointInPx * 2, radiusSelectorInPx * 2);
-
-        if (text != null) {
-            setTextPaint();
-            Rect textBounds = new Rect();
-            textPaint.getTextBounds(text, 0, text.length(), textBounds);
-            textHeight = textBounds.height();
-            textWidth = textBounds.width();
-            minShapeWidth = Math.max(minDiameterCirclesInPx, textWidth);
-            minShapeHeight = minDiameterCirclesInPx + textHeight + DEFAULT_TEXT_MARGIN_TOP;
-            centerShapeX = Math.max(minShapeWidth / 2, measuredWidthInPx / 2);
-            centerYcircles = (minDiameterCirclesInPx / 2) + ((measureHeightInPx - minShapeHeight) / 2);
-        } else {
-            minShapeWidth=minDiameterCirclesInPx;
-            minShapeHeight = minDiameterCirclesInPx;
-            centerShapeX = Math.max(minDiameterCirclesInPx / 2, measuredWidthInPx / 2);
-            centerYcircles = (minDiameterCirclesInPx / 2) + ((measureHeightInPx - minShapeHeight) / 2);
-        }
-
-
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "width in px " + canvas.getWidth() + " height in px " + canvas.getHeight());
         if (isChecked()) {
             Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "isChecked " + this);
@@ -240,6 +222,36 @@ public class RadialRadioButton extends RadioButton {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         measuredWidthInPx = getMeasuredWidth();
         measureHeightInPx = getMeasuredHeight();
+
+        radiusPointInPx = (int) convertToPx(radiusPoint);
+        radiusSelectorInPx = (int) convertToPx(radiusSelector);
+        minDiameterCirclesInPx = Math.max(radiusPointInPx * 2, radiusSelectorInPx * 2);
+        if (text != null) {
+            setTextPaint();
+            Rect textBounds = new Rect();
+            textPaint.getTextBounds(text, 0, text.length(), textBounds);
+            textHeight = textBounds.height();
+            textWidth = textBounds.width();
+            minShapeWidth = Math.max(minDiameterCirclesInPx, textWidth);
+            minShapeHeight = minDiameterCirclesInPx + textHeight + DEFAULT_TEXT_MARGIN_TOP;
+            centerShapeX = Math.max(minShapeWidth / 2, measuredWidthInPx / 2);
+            centerYcircles = (minDiameterCirclesInPx / 2) + ((measureHeightInPx - minShapeHeight) / 2);
+        } else {
+            minShapeWidth = minDiameterCirclesInPx;
+            minShapeHeight = minDiameterCirclesInPx;
+            centerShapeX = Math.max(minDiameterCirclesInPx / 2, measuredWidthInPx / 2);
+            centerYcircles = (minDiameterCirclesInPx / 2) + ((measureHeightInPx - minShapeHeight) / 2);
+        }
+
+        ViewGroup.LayoutParams layoutParams = getLayoutParams();
+        if (layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
+            measureHeightInPx = minShapeHeight+DEFAULT_SHAPE_MIN_PADDING;
+            Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "height wrap_content"+measureHeightInPx);
+        }
+        if (layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT) {
+            measuredWidthInPx = minShapeWidth+DEFAULT_SHAPE_MIN_PADDING;
+            Log.e("Nebo", Thread.currentThread().getStackTrace()[2] +  "width wrap_content"+measuredWidthInPx);
+        }
         setMeasuredDimension(measuredWidthInPx, measureHeightInPx);
     }
 }

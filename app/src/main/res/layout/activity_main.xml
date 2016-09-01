@@ -17,8 +17,8 @@
 
         <com.example.android.customradiobutton.RadialRadioButton
             android:id="@+id/radial_radiobutton1"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
              custom:radiusPoint="6"
             custom:radiusSelector="12"
              custom:text="Hello"
