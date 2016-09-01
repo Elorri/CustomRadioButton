@@ -190,7 +190,7 @@ public class RadialRadioButton extends RadioButton {
         colorPoint = Color.BLUE;
         paint.setColor(colorPoint);
         canvas.drawCircle(centerShapeX, centerYcircles, radiusPointInPx, paint);
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp" + radiusPoint + " radius in px" + radiusPointInPx);
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp " + radiusPoint + " radius in px " + radiusPointInPx);
     }
 
 
@@ -200,7 +200,7 @@ public class RadialRadioButton extends RadioButton {
         colorSelector = Color.RED;
         paint.setColor(colorSelector);
         canvas.drawCircle(centerShapeX, centerYcircles, radiusSelectorInPx, paint);
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp" + radiusSelector + " radius in px" + radiusSelectorInPx);
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp " + radiusSelector + " radius in px " + radiusSelectorInPx);
     }
 
     private void drawText(Canvas canvas, Paint paint, int centerShapeX, int minDiameterCirclesInPx, int textHeight, int textWidth, int minShapeHeight) {
@@ -220,8 +220,10 @@ public class RadialRadioButton extends RadioButton {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
         measuredWidthInPx = getMeasuredWidth();
         measureHeightInPx = getMeasuredHeight();
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measuredWidthInPx "+measuredWidthInPx+" measuredHeightInPx "+measureHeightInPx);
 
         radiusPointInPx = (int) convertToPx(radiusPoint);
         radiusSelectorInPx = (int) convertToPx(radiusSelector);
@@ -243,14 +245,17 @@ public class RadialRadioButton extends RadioButton {
             centerYcircles = (minDiameterCirclesInPx / 2) + ((measureHeightInPx - minShapeHeight) / 2);
         }
 
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measuredWidthInPx "+measuredWidthInPx+" measuredHeightInPx "+measureHeightInPx);
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "minShapeWidth "+minShapeWidth+" minShapeHeight "+minShapeHeight);
+
         ViewGroup.LayoutParams layoutParams = getLayoutParams();
         if (layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
             measureHeightInPx = minShapeHeight+DEFAULT_SHAPE_MIN_PADDING;
-            Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "height wrap_content"+measureHeightInPx);
+            Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "height wrap_content "+measureHeightInPx);
         }
         if (layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT) {
             measuredWidthInPx = minShapeWidth+DEFAULT_SHAPE_MIN_PADDING;
-            Log.e("Nebo", Thread.currentThread().getStackTrace()[2] +  "width wrap_content"+measuredWidthInPx);
+            Log.e("Nebo", Thread.currentThread().getStackTrace()[2] +  "width wrap_content "+measuredWidthInPx);
         }
         setMeasuredDimension(measuredWidthInPx, measureHeightInPx);
     }
