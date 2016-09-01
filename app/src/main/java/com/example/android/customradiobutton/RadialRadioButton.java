@@ -34,13 +34,13 @@ public class RadialRadioButton extends RadioButton {
 
 
     //The radius of the point that will be drawn in the center of the view
-    int radiusPoint;
+    float radiusPoint;
 
     //The color of the point
     int colorPoint;
 
     //The radius of the circle that will be drawn around the point when the radio button will be selected
-    int radiusSelector;
+    float radiusSelector;
 
     //The color of the selector
     int colorSelector;
@@ -85,8 +85,10 @@ public class RadialRadioButton extends RadioButton {
         super(context, attrs);
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.RadialRadioButton, 0, 0);
         try {
-            radiusPoint = a.getInteger(R.styleable.RadialRadioButton_radiusPoint, DEFAULT_MINIMUM_RADIUS_IN_DP);
-            radiusSelector = a.getInteger(R.styleable.RadialRadioButton_radiusSelector, DEFAULT_MINIMUM_RADIUS_SELECTOR_IN_DP);
+            radiusPoint = a.getDimension(R.styleable.RadialRadioButton_radiusPoint, DEFAULT_MINIMUM_RADIUS_IN_DP);
+            radiusPointInPx = (int) convertToPx(radiusPoint);
+            radiusSelector = a.getDimension(R.styleable.RadialRadioButton_radiusSelector, DEFAULT_MINIMUM_RADIUS_SELECTOR_IN_DP);
+            radiusSelectorInPx = (int) convertToPx(radiusSelector);
             colorPoint = a.getInteger(R.styleable.RadialRadioButton_colorPoint, DEFAULT_POINT_COLOR);
             colorSelector = a.getInteger(R.styleable.RadialRadioButton_colorSelector, DEFAULT_SELECTOR_COLOR);
             text = a.getString(R.styleable.RadialRadioButton_text);
@@ -101,7 +103,7 @@ public class RadialRadioButton extends RadioButton {
     }
 
 
-    public int getRadiusPoint() {
+    public float getRadiusPoint() {
         return radiusPoint;
     }
 
@@ -111,7 +113,7 @@ public class RadialRadioButton extends RadioButton {
         requestLayout();
     }
 
-    public int getRadiusSelector() {
+    public float getRadiusSelector() {
         return radiusSelector;
     }
 
@@ -211,7 +213,7 @@ public class RadialRadioButton extends RadioButton {
     }
 
 
-    private float convertToPx(int dp) {
+    private float convertToPx(float dp) {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
     }
@@ -225,8 +227,6 @@ public class RadialRadioButton extends RadioButton {
         measureHeightInPx = getMeasuredHeight();
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measuredWidthInPx "+measuredWidthInPx+" measuredHeightInPx "+measureHeightInPx);
 
-        radiusPointInPx = (int) convertToPx(radiusPoint);
-        radiusSelectorInPx = (int) convertToPx(radiusSelector);
         minDiameterCirclesInPx = Math.max(radiusPointInPx * 2, radiusSelectorInPx * 2);
         if (text != null) {
             setTextPaint();
