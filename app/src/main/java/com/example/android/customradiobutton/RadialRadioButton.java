@@ -144,4 +144,13 @@ public class RadialRadioButton extends RadioButton {
         return dp*5;
     }
 
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        heightInPx=h;
+        widthInPx=w;
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "old heightInPx" + oldh + "old widthInPx" + oldw);
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "heightInPx" + heightInPx + " widthInPx" + widthInPx);
+    }
 }
