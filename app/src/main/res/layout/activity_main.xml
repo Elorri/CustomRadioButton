@@ -17,18 +17,18 @@
 
         <com.example.android.customradiobutton.RadialRadioButton
             android:id="@+id/radial_radiobutton1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-             custom:radiusPoint="30"
-            custom:radiusSelector="@integer/radius_selector"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+             custom:radiusPoint="3"
+            custom:radiusSelector="6"
             android:background="@android:color/darker_gray"/>
 
         <com.example.android.customradiobutton.RadialRadioButton
             android:id="@+id/radial_radiobutton2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-             custom:radiusPoint="@integer/radiusPoint"
-            custom:radiusSelector="@integer/radius_selector"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            custom:radiusPoint="3"
+            custom:radiusSelector="6"
             android:background="@android:color/darker_gray"/>
     </RadioGroup>
 </RelativeLayout>

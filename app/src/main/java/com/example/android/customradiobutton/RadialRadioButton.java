@@ -34,9 +34,14 @@ public class RadialRadioButton extends RadioButton {
     //The colorPoint of the selector
     int colorSelector;
 
+    //Size of the square in which to bigger circle fits = minimum size square to see the drawing completely
+    private int measureHeightInPx;
+    private int measuredWidthInPx;
+
     //Canvas dimensions
     private int heightInPx;
     private int widthInPx;
+
 
 
     public RadialRadioButton(Context context, AttributeSet attrs) {
@@ -100,12 +105,11 @@ public class RadialRadioButton extends RadioButton {
     @Override
     protected void onDraw(Canvas canvas) {
         //canvas default size is 64px x 64px. To make sure our canvas is big enough, we can't use canvas.getWidth() and canvas.getHeight() method.
-        //We will wait for onSizeChanged to be called to get the size of the canvas that is able to fit the view instead.
+        //I try waiting for onSizeChanged to be called to get the size of the canvas that is able to fit the view instead, but I don't get better result.
+        //I will rely only on the onMeasureMethod
 
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "width in px " + canvas.getWidth() + " height in px " + canvas.getHeight());
         Paint paint = new Paint();
-        heightInPx=canvas.getHeight();
-        widthInPx=canvas.getWidth();
         if (isChecked()) {
             Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "isChecked " + this);
             drawPoint(canvas, paint);
@@ -121,8 +125,9 @@ public class RadialRadioButton extends RadioButton {
         paint.setStyle(Paint.Style.FILL);
         colorPoint = Color.BLUE;
         paint.setColor(colorPoint);
-        int radiusPointInPx = convertToPx(radiusPoint);
-        canvas.drawCircle(widthInPx / 2, heightInPx / 2, radiusPointInPx, paint);
+        int radiusPointInPx = (int)convertToPx(radiusPoint);
+        //canvas.drawCircle((widthInPx / 2)+5, (heightInPx / 2)+5, radiusPointInPx, paint);
+        canvas.drawCircle(measuredWidthInPx / 2, measureHeightInPx / 2, radiusPointInPx, paint);
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp" + radiusPoint + " radius in px" + radiusPointInPx);
     }
 
@@ -132,25 +137,52 @@ public class RadialRadioButton extends RadioButton {
         paint.setStrokeWidth(DEFAULT_STROKE_WIDTH_IN_DP);
         colorSelector = Color.RED;
         paint.setColor(colorSelector);
-        int radiusSelectorInPx = convertToPx(radiusSelector);
-        canvas.drawCircle(widthInPx / 2, heightInPx / 2, radiusSelectorInPx, paint);
+        int radiusSelectorInPx = (int)convertToPx(radiusSelector);
+        //canvas.drawCircle((widthInPx / 2)+5, (heightInPx / 2)+5, radiusSelectorInPx, paint);
+        canvas.drawCircle(measuredWidthInPx / 2, measureHeightInPx / 2, radiusSelectorInPx, paint);
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp" + radiusSelector + " radius in px" + radiusSelectorInPx);
     }
 
 
-    private int convertToPx(int dp) {
+    private float convertToPx(int dp) {
 //        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 //        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
         return dp*5;
     }
 
+    public float convertPixelsToDp(float px){
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        float dp = px / ((float)displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return dp;
+    }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        heightInPx=h;
-        widthInPx=w;
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "old heightInPx" + oldh + "old widthInPx" + oldw);
-        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "heightInPx" + heightInPx + " widthInPx" + widthInPx);
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measure width in px " + widthMeasureSpec + "measure height in px " + heightMeasureSpec);
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measure width in dp " + convertPixelsToDp(widthMeasureSpec) + "measure height in dp " + convertPixelsToDp(heightMeasureSpec));
+        measuredWidthInPx = getMeasuredWidth();
+        measureHeightInPx=getMeasuredHeight();
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measuredWidth " + measuredWidthInPx + "measureHeight " + measureHeightInPx);
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "measuredWidth in dp" + convertPixelsToDp(measuredWidthInPx) + "measureHeight in dp" + convertPixelsToDp(measureHeightInPx));
+
+
+
+        int minimumWidthPx=Math.max((int)convertToPx(radiusPoint*2), (int)convertToPx(radiusSelector*2));
+        int minimumHeightPx=Math.max((int)convertToPx(radiusPoint*2), (int)convertToPx(radiusSelector*2));
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "minimumCanvasWidthPx " + minimumWidthPx + "minimumCanvasHeightPx " + minimumHeightPx);
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "minimumCanvasWidthPx " + convertPixelsToDp(minimumWidthPx) + "minimumCanvasHeightPx " + convertPixelsToDp(minimumHeightPx));
+
+        widthInPx = minimumWidthPx;
+        heightInPx = minimumHeightPx;
+
+
+//        widthInPx = Math.max(minimumWidthPx, measuredWidth);
+//        heightInPx = Math.max(minimumHeightPx, measureHeight);
+
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "widthInPx " + widthInPx + "widthInPx " + heightInPx);
+
+        //setMeasuredDimension(widthInPx+10, heightInPx+10);
+        setMeasuredDimension(measuredWidthInPx, measureHeightInPx);
     }
 }
