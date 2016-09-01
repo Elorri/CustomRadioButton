@@ -3,6 +3,7 @@ package com.example.android.customradiobutton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.RadioGroup;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,5 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
         RadialRadioButton radioButton2=(RadialRadioButton)findViewById(R.id.radial_radiobutton2);
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2]+"radiusSelector2 isChecked "+radioButton2.isChecked()+" "+radioButton2);
+
+        RadioGroup radioGroup=(RadioGroup)findViewById(R.id.radiogroup);
+        radioGroup.check(radioButton1.getId());
     }
 }
