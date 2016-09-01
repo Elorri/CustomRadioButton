@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -21,27 +22,39 @@ public class RadialRadioButton extends RadioButton {
     private static final int DEFAULT_POINT_COLOR = 6;
     private static final int DEFAULT_SELECTOR_COLOR = 8;
     private static final float DEFAULT_STROKE_WIDTH_IN_DP = 4;
+    private static final int DEFAULT_TEXT_COLOR=Color.DKGRAY;
+    private static final int DEFAULT_TEXT_SIZE=24;
 
-    //The pointRadius of the point that will be drawn in the center of the view
+
+    //The radius of the point that will be drawn in the center of the view
     int radiusPoint;
 
-    //The colorPoint of the point
+    //The color of the point
     int colorPoint;
 
-    //The radiusPoint of the circle that will be drawn around the point when the radio button will be selected
+    //The radius of the circle that will be drawn around the point when the radio button will be selected
     int radiusSelector;
 
-    //The colorPoint of the selector
+    //The color of the selector
     int colorSelector;
 
-    //Size of the square in which to bigger circle fits = minimum size square to see the drawing completely
+    //The text of the radiobutton if there is some
+    String text;
+
+
+    //Size requested by the xml layout_width and layout_height
     private int measureHeightInPx;
     private int measuredWidthInPx;
 
-    //Canvas dimensions
-    private int minimumHeightInPx;
-    private int minimumWidthInPx;
 
+
+//    //Size of the rectangle in which to bigger circle (point or selector) + text (if there is some) fits = minimum size rectangle to see the drawing completely
+//    private int minimumHeightInPx;
+//    private int minimumWidthInPx;
+//
+//    //Size of the rectangle in which fit the text
+//    private int textWidth;
+//    private int textHeight;
 
 
     public RadialRadioButton(Context context, AttributeSet attrs) {
@@ -52,10 +65,12 @@ public class RadialRadioButton extends RadioButton {
             radiusSelector = a.getInteger(R.styleable.RadialRadioButton_radiusSelector, DEFAULT_MINIMUM_RADIUS_SELECTOR_IN_DP);
             colorPoint = a.getInteger(R.styleable.RadialRadioButton_colorPoint, DEFAULT_POINT_COLOR);
             colorSelector = a.getInteger(R.styleable.RadialRadioButton_colorSelector, DEFAULT_SELECTOR_COLOR);
+            text = a.getString(R.styleable.RadialRadioButton_text);
             Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radiusPoint " + radiusPoint);
             Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radiusSelector " + radiusSelector);
             Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "colorPoint " + colorPoint);
             Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "colorSelector " + colorSelector);
+            Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "text " + text);
         } finally {
             a.recycle();
         }
@@ -102,43 +117,101 @@ public class RadialRadioButton extends RadioButton {
         requestLayout();
     }
 
+
+    @Override
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+        invalidate();
+        requestLayout();
+    }
+
+
     @Override
     protected void onDraw(Canvas canvas) {
         //canvas default size is 64px x 64px. To make sure our canvas is big enough, we can't use canvas.getWidth() and canvas.getHeight() method.
         //I try waiting for onSizeChanged to be called to get the size of the canvas that is able to fit the view instead, but I don't get better result.
         //I will rely only on the onMeasureMethod
 
+        int radiusPointInPx = (int) convertToPx(radiusPoint);
+        int radiusSelectorInPx = (int) convertToPx(radiusSelector);
+        int minDiameterCirclesInPx = Math.max(radiusPointInPx * 2, radiusSelectorInPx * 2);
+
+        int centerShapeX;
+        int centerYcircles = minDiameterCirclesInPx / 2;
+        int textHeight = 0;
+        int textWidth = 0;
+
+
+        Paint paint;
+        if (text != null) {
+            paint = createTextPaint();
+            Rect textBounds = new Rect();
+            paint.getTextBounds(text, 0, text.length(), textBounds);
+            textHeight = textBounds.height();
+            textWidth = textBounds.width();
+            int minShapeWidth = Math.max(minDiameterCirclesInPx, textWidth);
+            centerShapeX = minShapeWidth / 2;
+        } else {
+            paint = new Paint();
+            centerShapeX = minDiameterCirclesInPx / 2;
+        }
+
+
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "width in px " + canvas.getWidth() + " height in px " + canvas.getHeight());
-        Paint paint = new Paint();
         if (isChecked()) {
             Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "isChecked " + this);
-            drawPoint(canvas, paint);
-            drawSelector(canvas, paint);
+            drawPoint(canvas, paint, centerShapeX, centerYcircles, radiusPointInPx);
+            drawSelector(canvas, paint, centerShapeX, centerYcircles, radiusSelectorInPx);
+            drawText(canvas, paint, centerShapeX, minDiameterCirclesInPx, textHeight, textWidth);
         } else {
             Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "isUnchecked " + this);
-            drawPoint(canvas, paint);
+            drawPoint(canvas, paint, centerShapeX, centerYcircles, radiusPointInPx);
+            drawText(canvas, paint, centerShapeX, minDiameterCirclesInPx, textHeight, textWidth);
         }
     }
 
+    private Paint createTextPaint() {
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "Offer possibility to customise color here ");
+        int colorText = DEFAULT_TEXT_COLOR;
+        Paint paint=new Paint();
+        paint.setColor(colorText);
+//            Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
+//            paint.setTypeface(NORMAL_TYPEFACE);
+//            paint.setAntiAlias(true);
+        Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "Offer possibility to customise size here ");
+        float textSize = DEFAULT_TEXT_SIZE;
+        paint.setTextSize(textSize);
+        return paint;
+    }
 
-    private void drawPoint(Canvas canvas, Paint paint) {
+
+    private void drawPoint(Canvas canvas, Paint paint, int centerShapeX, int centerYcircles, int radiusPointInPx) {
         paint.setStyle(Paint.Style.FILL);
         colorPoint = Color.BLUE;
         paint.setColor(colorPoint);
-        int radiusPointInPx = (int)convertToPx(radiusPoint);
-        canvas.drawCircle(measuredWidthInPx / 2, measureHeightInPx / 2, radiusPointInPx, paint);
+        canvas.drawCircle(centerShapeX, centerYcircles, radiusPointInPx, paint);
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp" + radiusPoint + " radius in px" + radiusPointInPx);
     }
 
 
-    private void drawSelector(Canvas canvas, Paint paint) {
+    private void drawSelector(Canvas canvas, Paint paint, int centerShapeX, int centerYcircles, int radiusSelectorInPx) {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(DEFAULT_STROKE_WIDTH_IN_DP);
         colorSelector = Color.RED;
         paint.setColor(colorSelector);
-        int radiusSelectorInPx = (int)convertToPx(radiusSelector);
-        canvas.drawCircle(measuredWidthInPx / 2, measureHeightInPx / 2, radiusSelectorInPx, paint);
+        canvas.drawCircle(centerShapeX, centerYcircles, radiusSelectorInPx, paint);
         Log.e("Nebo", Thread.currentThread().getStackTrace()[2] + "radius in dp" + radiusSelector + " radius in px" + radiusSelectorInPx);
+    }
+
+    private void drawText(Canvas canvas, Paint paint, int centerShapeX, int minDiameterCirclesInPx, int textHeight, int textWidth) {
+        if (text != null) {
+            int centerYText = minDiameterCirclesInPx + textHeight / 2;
+            canvas.drawText(text, centerShapeX - textWidth / 2, centerYText, paint);
+        }
     }
 
 
@@ -152,15 +225,7 @@ public class RadialRadioButton extends RadioButton {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         measuredWidthInPx = getMeasuredWidth();
-        measureHeightInPx=getMeasuredHeight();
-
-        int diameterPointInPx=(int)convertToPx(radiusPoint*2);
-        int diameterSelectorInPx=(int)convertToPx(radiusSelector*2);
-        int minimumWidthPx=Math.max(diameterPointInPx, diameterSelectorInPx);
-        int minimumHeightPx=Math.max((int)convertToPx(radiusPoint*2), (int)convertToPx(radiusSelector*2));
-        minimumWidthInPx = minimumWidthPx;
-        minimumHeightInPx = minimumHeightPx;
-
+        measureHeightInPx = getMeasuredHeight();
         setMeasuredDimension(measuredWidthInPx, measureHeightInPx);
     }
 }

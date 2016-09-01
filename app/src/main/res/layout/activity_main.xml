@@ -17,10 +17,11 @@
 
         <com.example.android.customradiobutton.RadialRadioButton
             android:id="@+id/radial_radiobutton1"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
              custom:radiusPoint="6"
             custom:radiusSelector="12"
+             custom:text="Hello"
             android:background="@android:color/darker_gray"/>
 
         <com.example.android.customradiobutton.RadialRadioButton
