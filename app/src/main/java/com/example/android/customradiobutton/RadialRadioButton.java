@@ -147,6 +147,7 @@ public class RadialRadioButton extends RadioButton {
         int textHeight = 0;
         int textWidth = 0;
         int minShapeHeight = 0;
+        int minShapeWidth=0;
 
 
         Paint paint;
@@ -156,14 +157,15 @@ public class RadialRadioButton extends RadioButton {
             paint.getTextBounds(text, 0, text.length(), textBounds);
             textHeight = textBounds.height();
             textWidth = textBounds.width();
-            int minShapeWidth = Math.max(minDiameterCirclesInPx, textWidth);
-            centerShapeX = Math.max(minShapeWidth / 2, measuredWidthInPx / 2);
+            minShapeWidth = Math.max(minDiameterCirclesInPx, textWidth);
             minShapeHeight = minDiameterCirclesInPx + textHeight + DEFAULT_TEXT_MARGIN_TOP;
+            centerShapeX = Math.max(minShapeWidth / 2, measuredWidthInPx / 2);
             centerYcircles = (minDiameterCirclesInPx / 2) + ((measureHeightInPx - minShapeHeight) / 2);
         } else {
             paint = new Paint();
-            centerShapeX = Math.max(minDiameterCirclesInPx / 2, measuredWidthInPx / 2);
+            minShapeWidth=minDiameterCirclesInPx;
             minShapeHeight = minDiameterCirclesInPx;
+            centerShapeX = Math.max(minDiameterCirclesInPx / 2, measuredWidthInPx / 2);
             centerYcircles = (minDiameterCirclesInPx / 2) + ((measureHeightInPx - minShapeHeight) / 2);
         }
 
