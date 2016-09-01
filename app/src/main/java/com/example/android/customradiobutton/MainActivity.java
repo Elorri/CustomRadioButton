@@ -32,5 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         RadioGroup radioGroup=(RadioGroup)findViewById(R.id.radiogroup);
         radioGroup.check(radioButton1.getId());
+
+
     }
 }
